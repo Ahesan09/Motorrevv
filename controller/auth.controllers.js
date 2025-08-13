@@ -8,6 +8,7 @@ import {
   hashPassword,
   comparePassword,
   createAccessToken,
+  authenticateUser,
 } from "../services/auth.service.js";
 
 export const registerUser = async (req, res) => {
@@ -22,8 +23,8 @@ export const registerUser = async (req, res) => {
 
     const { name, email, password, phone } = parsed.data;
 
-    const userExists = await getUserByEmail(email);
-    if (userExists) {
+    const user = await getUserByEmail(email);
+    if (user) {
       return res.status(400).json({ error: "Email already registered" });
     }
 
@@ -37,9 +38,17 @@ export const registerUser = async (req, res) => {
       userImage,
       role: "user",
     });
+    await authenticateUser({ req, res, user: newUser, name, email });
 
     res.status(201).json({
-      user: { id: newUser.id, name, email, phone , role: newUser.role,userImage: newUser.userImage },
+      user: {
+        id: newUser.id,
+        name,
+        email,
+        phone,
+        role: newUser.role,
+        userImage: newUser.userImage,
+      },
       message: "User registered successfully",
     });
   } catch (err) {
@@ -62,9 +71,7 @@ export const loginUser = async (req, res) => {
     const isValid = await comparePassword(password, user.password);
     if (!isValid)
       return res.status(401).json({ error: "Invalid email or password" });
-
-    const token = createAccessToken(user);
-
+    const { accessToken, refreshToken } =  await authenticateUser({ req, res, user });
     res.json({
       user: {
         id: user.id,
@@ -74,8 +81,11 @@ export const loginUser = async (req, res) => {
         userImage: user.userImage,
         role: user.role,
       },
+      tokens: {
+        accessToken,
+        refreshToken,
+      },
       message: "Login successful",
-      token,
     });
   } catch (err) {
     console.error(err);

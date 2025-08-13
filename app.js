@@ -1,10 +1,11 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import flash from "connect-flash";
-import requestIp from "request-ip";
-
+import { verifyAuthentication } from "./middleware/verify-auth-middleware.js";
+import requestIp from 'request-ip'
 import { carRoutes } from "./routes/cars.routes.js";
 import { authRoutes } from "./routes/auth.routes.js";
+import session from "express-session";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,8 +24,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(flash());
 
+// Session management 
+app.use(
+    session({secret:"my-secret",resave:true,saveUninitialized:false})
+);
+
 // Get client IP
 app.use(requestIp.mw());
+
+// Authentication middleware
+app.use(verifyAuthentication)
 
 // Make user info available in templates or routes (optional)
 app.use((req, res, next) => {
