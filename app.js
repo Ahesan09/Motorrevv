@@ -1,30 +1,52 @@
-import cookieParser from 'cookie-parser';
-import express from 'express';
-import flash from 'connect-flash'
-import requestIp from 'request-ip'
-import { carRoutes } from './routes/cars.routes.js';
+import express from "express";
+import cookieParser from "cookie-parser";
+import flash from "connect-flash";
+import requestIp from "request-ip";
+
+import { carRoutes } from "./routes/cars.routes.js";
+import { authRoutes } from "./routes/auth.routes.js";
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.static("public"));
-app.use(express.urlencoded({extended:true}));
-app.use(express.json());
-app.use(cookieParser())
-// app.use(
-//     session({secret:"my-secret",resave:true,saveUninitialized:false})
-// );
-app.use(flash());
-app.use(requestIp.mw());
-app.use(carRoutes)
-// app.use(verifyAuthentication)
-app.use((req,res,next)=>{
-    res.locals.user = req.user
-    return next();
-})
-// app.use(authRoutes)
-// app.use(shortenerRoutes);
-// app.set("view engine","ejs");
+// -------------------- Middleware --------------------
 
-app.listen(PORT,()=>{
-    console.log(`Server running at http://localhost:${PORT}`)
-})
+// Serve static files
+app.use(express.static("public"));
+app.use("/uploads", express.static("uploads"));
+
+// Parse request body
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Cookies and flash messages
+app.use(cookieParser());
+app.use(flash());
+
+// Get client IP
+app.use(requestIp.mw());
+
+// Make user info available in templates or routes (optional)
+app.use((req, res, next) => {
+  res.locals.user = req.user || null;
+  next();
+});
+
+// -------------------- Routes --------------------
+app.use(carRoutes);      // prefix for car APIs
+app.use(authRoutes);     // prefix for auth APIs
+
+// -------------------- Error handling (optional) --------------------
+app.use((req, res, next) => {
+  res.status(404).json({ error: "Route not found" });
+});
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Something went wrong!" });
+});
+
+// -------------------- Start Server --------------------
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});

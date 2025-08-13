@@ -1,5 +1,6 @@
 // drizzle/schema/cars.js
-import { mysqlTable, int, varchar, decimal, text, timestamp } from "drizzle-orm/mysql-core";
+import { mysqlTable, int, varchar, decimal, text, timestamp, json } from "drizzle-orm/mysql-core";
+import { boolean } from "zod";
 
 export const cars = mysqlTable("cars", {
   id: int("id").primaryKey().autoincrement(),
@@ -10,6 +11,20 @@ export const cars = mysqlTable("cars", {
   fuelType: varchar("fuel_type", { length: 50 }).notNull(),
   transmission: varchar("transmission", { length: 50 }).notNull(),
   description: text("description"),
-  imageUrl: varchar("image_url", { length: 500 }),
+  image: json("image"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").onUpdateNow().defaultNow(),
+});
+
+
+export const usersTable = mysqlTable("users", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  password: varchar("password", { length: 255 }),
+  phone: varchar("phone", { length: 20 }),
+  userImage: text("user_image"),
+  role: varchar("role", { length: 50 }).default("user").notNull(), // <-- added role field
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });

@@ -5,7 +5,11 @@ import {db} from "../config/db.js";
 
 
 export const createCar = async (carData) => {
-  return await db.insert(cars).values(carData);
+  const [car] = await db.insert(cars).values(carData);
+   if (car) {
+    car.image = car.image || [];
+  }
+  return car;
 };
 
 export const getCars = async ({ page, limit, search }) => {
@@ -44,4 +48,28 @@ export const getCars = async ({ page, limit, search }) => {
     limit: Number(limit),
   };
 };
+export const getCarsById = async (id) => {
+  const [car] = await db
+    .select()
+    .from(cars)
+    .where(eq(cars.id, id))
+    .limit(1); // just in case
+  return car || null;
+};
 
+export const editCars = async (id, updatedData) => {
+  const [existingCar] = await db.select().from(cars).where(eq(cars.id, id));
+  if (!existingCar) return null;
+
+  await db.update(cars).set(updatedData).where(eq(cars.id, id));
+
+  const [car] = await db.select().from(cars).where(eq(cars.id, id));
+  if (car) {
+    car.image = car.image || [];
+  }
+  return car;
+};
+
+export const deleteCars = async(id)=>{
+return db.delete(cars).where(eq(cars.id, id));
+}

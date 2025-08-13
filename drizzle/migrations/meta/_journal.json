@@ -8,6 +8,41 @@
       "when": 1754907844897,
       "tag": "0000_motionless_dagger",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1754984208236,
+      "tag": "0001_dry_lionheart",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1754992911159,
+      "tag": "0002_heavy_mole_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1755061576951,
+      "tag": "0003_flat_jackal",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1755064774232,
+      "tag": "0004_hard_vin_gonzales",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1755064840680,
+      "tag": "0005_tiresome_silk_fever",
+      "breakpoints": true
     }
   ]
 }

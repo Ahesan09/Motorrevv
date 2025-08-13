@@ -1,0 +1,1 @@
+ALTER TABLE `cars` ADD `updated_at` timestamp DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP;
